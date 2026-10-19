@@ -1,0 +1,8 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Query {
+  """Verifica se a API e o banco estão no ar"""
+  health: String!
+}

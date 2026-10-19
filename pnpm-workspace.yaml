@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+  "@apollo/protobufjs": false
+  workerd: false
+  esbuild: true
+  prisma: true
+  "@prisma/engines": true

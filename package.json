@@ -1,0 +1,24 @@
+{
+  "name": "hermex",
+  "private": true,
+  "packageManager": "pnpm@12.14.0",
+  "scripts": {
+    "web": "pnpm --filter web",
+    "api": "pnpm --filter api",
+    "dev": "pnpm --parallel --filter web --filter api run dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm --filter web --filter api run build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "lint:web": "pnpm --filter web lint",
+    "lint:api": "pnpm --filter api lint",
+    "test:api": "pnpm --filter api test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "prisma:generate": "pnpm --filter api exec prisma generate",
+    "prisma:migrate": "pnpm --filter api exec prisma migrate dev",
+    "prisma:studio": "pnpm --filter api exec prisma studio"
+  }
+}
