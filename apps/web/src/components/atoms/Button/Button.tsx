@@ -1,13 +1,20 @@
 import type { ButtonHTMLAttributes } from "react";
 
+export type ButtonVariant = "primary" | "secondary";
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary";
+  variant?: ButtonVariant;
 };
 
-const variants = {
-  primary: "bg-foreground text-background hover:opacity-90",
-  secondary: "border border-foreground/20 hover:bg-foreground/5",
+const variants: Record<ButtonVariant, string> = {
+  primary: "bg-primary text-white hover:bg-primary-dark",
+  secondary: "bg-secondary text-white hover:bg-secondary-dark",
 };
+
+// Classes do botão, reutilizáveis em links estilizados como botão.
+export function buttonClassName(variant: ButtonVariant = "primary") {
+  return `inline-flex items-center justify-center gap-2 rounded px-4 py-3 text-body-md whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 ${variants[variant]}`;
+}
 
 export function Button({
   variant = "primary",
@@ -15,9 +22,6 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
-      className={`h-10 rounded-md px-4 text-sm font-medium transition disabled:opacity-50 ${variants[variant]} ${className}`}
-      {...props}
-    />
+    <button className={`${buttonClassName(variant)} ${className}`} {...props} />
   );
 }

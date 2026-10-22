@@ -27,3 +27,7 @@ coverage/
 
 # prisma generated client
 apps/api/src/generated/
+
+# storybook
+storybook-static/
+*storybook.log
