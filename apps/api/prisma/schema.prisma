@@ -12,10 +12,11 @@ datasource db {
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(cuid())
+  name      String    @unique
+  vehicles  Vehicle[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Location {
@@ -26,4 +27,21 @@ model Location {
   state     String   @db.Char(2)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Vehicle {
+  id           String   @id @default(cuid())
+  brand        String
+  model        String
+  year         Int
+  licensePlate String   @unique
+  dailyRate    Decimal  @db.Decimal(10, 2)
+  available    Boolean  @default(true)
+  imageUrl     String?
+  // MANUAL | AUTOMATIC — validado pelo enum do GraphQL, não por enum do banco
+  transmission String
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

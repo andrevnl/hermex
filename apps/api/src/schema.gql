@@ -38,4 +38,49 @@ type Query {
 
   """Lista todos os locais, ordenados por nome"""
   locations: [Location!]!
+
+  """Lista os veículos com a categoria"""
+  vehicles: [Vehicle!]!
+}
+
+"""Tipo de câmbio do veículo"""
+enum Transmission {
+  """Câmbio automático"""
+  AUTOMATIC
+
+  """Câmbio manual"""
+  MANUAL
+}
+
+"""Veículo disponível para locação"""
+type Vehicle {
+  """Indica se o veículo está disponível para locação"""
+  available: Boolean!
+
+  """Marca do veículo (ex.: Hyundai)"""
+  brand: String!
+
+  """Categoria do veículo"""
+  category: Category!
+
+  """Valor da diária, em reais"""
+  dailyRate: Float!
+
+  """Identificador do veículo"""
+  id: ID!
+
+  """Caminho da imagem do veículo servida pelo web"""
+  imageUrl: String
+
+  """Placa do veículo"""
+  licensePlate: String!
+
+  """Modelo do veículo (ex.: HB20 1.0)"""
+  model: String!
+
+  """Tipo de câmbio do veículo"""
+  transmission: Transmission!
+
+  """Ano do veículo"""
+  year: Int!
 }
