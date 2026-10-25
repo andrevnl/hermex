@@ -11,10 +11,31 @@ type Category {
   name: String!
 }
 
+"""Local de retirada e devolução de veículos"""
+type Location {
+  """Endereço do local"""
+  address: String!
+
+  """Cidade do local"""
+  city: String!
+
+  """Identificador do local"""
+  id: ID!
+
+  """Nome do local"""
+  name: String!
+
+  """Sigla do estado (UF), com 2 letras"""
+  state: String!
+}
+
 type Query {
   """Lista todas as categorias, ordenadas por nome"""
   categories: [Category!]!
 
   """Verifica se a API e o banco estão no ar"""
   health: String!
+
+  """Lista todos os locais, ordenados por nome"""
+  locations: [Location!]!
 }

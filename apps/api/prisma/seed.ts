@@ -12,6 +12,28 @@ const categories = [
   'Compacto',
 ];
 
+// Locais de retirada e devolução de exemplo
+const locations = [
+  {
+    name: 'Aeroporto de Guarulhos',
+    address: 'Rod. Hélio Smidt, s/n – Terminal 2',
+    city: 'Guarulhos',
+    state: 'SP',
+  },
+  {
+    name: 'Centro do Rio de Janeiro',
+    address: 'Av. Rio Branco, 156',
+    city: 'Rio de Janeiro',
+    state: 'RJ',
+  },
+  {
+    name: 'Savassi',
+    address: 'Rua Pernambuco, 1000',
+    city: 'Belo Horizonte',
+    state: 'MG',
+  },
+];
+
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
@@ -23,6 +45,14 @@ async function main() {
       where: { name },
       update: {},
       create: { name },
+    });
+  }
+
+  for (const location of locations) {
+    await prisma.location.upsert({
+      where: { name: location.name },
+      update: {},
+      create: location,
     });
   }
 }
