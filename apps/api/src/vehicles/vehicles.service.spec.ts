@@ -36,12 +36,43 @@ describe('VehiclesService', () => {
     service = module.get<VehiclesService>(VehiclesService);
   });
 
-  it('busca os veículos incluindo a categoria na mesma consulta', async () => {
+  it('sem categoria, busca só os disponíveis incluindo a categoria', async () => {
     findMany.mockResolvedValue([]);
 
     await service.findAll();
 
-    expect(findMany).toHaveBeenCalledWith({ include: { category: true } });
+    expect(findMany).toHaveBeenCalledWith({
+      where: { available: true, categoryId: undefined },
+      include: { category: true },
+    });
+  });
+
+  it('com categoria, filtra pelos disponíveis daquela categoria no banco', async () => {
+    findMany.mockResolvedValue([dbVehicle]);
+
+    await service.findAll(hatch.id);
+
+    expect(findMany).toHaveBeenCalledWith({
+      where: { available: true, categoryId: hatch.id },
+      include: { category: true },
+    });
+  });
+
+  it('trata categoryId nulo como ausente', async () => {
+    findMany.mockResolvedValue([]);
+
+    await service.findAll(null);
+
+    expect(findMany).toHaveBeenCalledWith({
+      where: { available: true, categoryId: undefined },
+      include: { category: true },
+    });
+  });
+
+  it('retorna lista vazia para categoria inexistente', async () => {
+    findMany.mockResolvedValue([]);
+
+    await expect(service.findAll('inexistente')).resolves.toEqual([]);
   });
 
   it('retorna categoria, câmbio e diária como número', async () => {

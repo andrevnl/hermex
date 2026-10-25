@@ -38,6 +38,14 @@ describe('VehiclesResolver', () => {
     findAll.mockResolvedValue(vehicles);
 
     await expect(resolver.vehicles()).resolves.toEqual(vehicles);
-    expect(findAll).toHaveBeenCalledOnce();
+    expect(findAll).toHaveBeenCalledWith(undefined);
+  });
+
+  it('repassa o categoryId ao service', async () => {
+    findAll.mockResolvedValue([]);
+
+    await resolver.vehicles('c1');
+
+    expect(findAll).toHaveBeenCalledWith('c1');
   });
 });

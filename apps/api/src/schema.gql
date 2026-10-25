@@ -39,8 +39,13 @@ type Query {
   """Lista todos os locais, ordenados por nome"""
   locations: [Location!]!
 
-  """Lista os veículos com a categoria"""
-  vehicles: [Vehicle!]!
+  """
+  Lista os veículos disponíveis com a categoria, filtrando opcionalmente por categoria
+  """
+  vehicles(
+    """Filtra pelos veículos desta categoria"""
+    categoryId: ID
+  ): [Vehicle!]!
 }
 
 """Tipo de câmbio do veículo"""
