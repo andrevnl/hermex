@@ -40,12 +40,18 @@ type Query {
   locations: [Location!]!
 
   """
-  Lista os veículos disponíveis com a categoria, filtrando opcionalmente por categoria
+  Lista paginada dos veículos disponíveis com a categoria, filtrando opcionalmente por categoria
   """
   vehicles(
     """Filtra pelos veículos desta categoria"""
     categoryId: ID
-  ): [Vehicle!]!
+
+    """Quantidade de veículos a pular (offset)"""
+    skip: Int! = 0
+
+    """Quantidade de veículos por página (máximo 27)"""
+    take: Int! = 9
+  ): VehiclePage!
 }
 
 """Tipo de câmbio do veículo"""
@@ -88,4 +94,13 @@ type Vehicle {
 
   """Ano do veículo"""
   year: Int!
+}
+
+"""Página de veículos com o total filtrado"""
+type VehiclePage {
+  """Veículos desta página"""
+  items: [Vehicle!]!
+
+  """Total de veículos que atendem ao filtro, sem paginação"""
+  totalCount: Int!
 }

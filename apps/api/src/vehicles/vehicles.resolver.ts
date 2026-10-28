@@ -1,14 +1,15 @@
-import { Args, ID, Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Int, Query, Resolver } from '@nestjs/graphql';
+import { VehiclePage } from './vehicle-page.model.js';
 import { Vehicle } from './vehicle.model.js';
-import { VehiclesService } from './vehicles.service.js';
+import { DEFAULT_TAKE, VehiclesService } from './vehicles.service.js';
 
 @Resolver(() => Vehicle)
 export class VehiclesResolver {
   constructor(private readonly vehiclesService: VehiclesService) {}
 
-  @Query(() => [Vehicle], {
+  @Query(() => VehiclePage, {
     description:
-      'Lista os veículos disponíveis com a categoria, filtrando opcionalmente por categoria',
+      'Lista paginada dos veículos disponíveis com a categoria, filtrando opcionalmente por categoria',
   })
   vehicles(
     @Args('categoryId', {
@@ -17,7 +18,19 @@ export class VehiclesResolver {
       description: 'Filtra pelos veículos desta categoria',
     })
     categoryId?: string | null,
-  ): Promise<Vehicle[]> {
-    return this.vehiclesService.findAll(categoryId);
+    @Args('skip', {
+      type: () => Int,
+      defaultValue: 0,
+      description: 'Quantidade de veículos a pular (offset)',
+    })
+    skip?: number,
+    @Args('take', {
+      type: () => Int,
+      defaultValue: DEFAULT_TAKE,
+      description: 'Quantidade de veículos por página (máximo 27)',
+    })
+    take?: number,
+  ): Promise<VehiclePage> {
+    return this.vehiclesService.findAll(categoryId, skip, take);
   }
 }
