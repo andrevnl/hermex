@@ -7,14 +7,16 @@ import { VehiclesService } from './vehicles.service.js';
 describe('VehiclesResolver', () => {
   let resolver: VehiclesResolver;
   const findAll = vi.fn();
+  const search = vi.fn();
 
   beforeEach(async () => {
     findAll.mockReset();
+    search.mockReset();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         VehiclesResolver,
-        { provide: VehiclesService, useValue: { findAll } },
+        { provide: VehiclesService, useValue: { findAll, search } },
       ],
     }).compile();
 
@@ -51,5 +53,20 @@ describe('VehiclesResolver', () => {
     await resolver.vehicles('c1', 9, 9);
 
     expect(findAll).toHaveBeenCalledWith('c1', 9, 9);
+  });
+
+  it('repassa o input da busca, skip e take ao service', async () => {
+    const page = { items: [], totalCount: 0 };
+    search.mockResolvedValue(page);
+    const input = {
+      pickupLocationId: 'l1',
+      returnLocationId: 'l2',
+      pickupDate: new Date('2026-11-01T10:00:00Z'),
+      returnDate: new Date('2026-11-05T10:00:00Z'),
+      categoryId: 'c1',
+    };
+
+    await expect(resolver.searchVehicles(input, 9, 9)).resolves.toEqual(page);
+    expect(search).toHaveBeenCalledWith(input, 9, 9);
   });
 });

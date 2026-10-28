@@ -143,6 +143,85 @@ describe('VehiclesService', () => {
     expect(totalCount).toBe(1);
   });
 
+  describe('search', () => {
+    const input = {
+      pickupLocationId: 'l1',
+      returnLocationId: 'l2',
+      pickupDate: new Date('2026-11-01T10:00:00Z'),
+      returnDate: new Date('2026-11-05T10:00:00Z'),
+    };
+
+    it('busca os disponíveis com a mesma lógica da listagem', async () => {
+      count.mockResolvedValue(1);
+      findMany.mockResolvedValue([dbVehicle]);
+
+      const page = await service.search(input);
+
+      expect(findMany).toHaveBeenCalledWith({
+        where: { available: true, categoryId: undefined },
+        include: { category: true },
+        orderBy,
+        skip: 0,
+        take: 9,
+      });
+      expect(page.items[0]).toMatchObject({ brand: 'Hyundai', dailyRate: 120 });
+      expect(page.totalCount).toBe(1);
+    });
+
+    it('filtra por categoria quando informada', async () => {
+      await service.search({ ...input, categoryId: hatch.id });
+
+      const where = { available: true, categoryId: hatch.id };
+      expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where }));
+      expect(count).toHaveBeenCalledWith({ where });
+    });
+
+    it('repassa skip e take com as mesmas regras da listagem', async () => {
+      const findAll = vi.spyOn(service, 'findAll');
+
+      await service.search(input, 9, 100);
+
+      expect(findAll).toHaveBeenCalledWith(undefined, 9, 100);
+      expect(findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: 9, take: 27 }),
+      );
+    });
+
+    it('rejeita devolução anterior à retirada com erro descritivo', () => {
+      const search = () =>
+        service.search({
+          ...input,
+          pickupDate: input.returnDate,
+          returnDate: input.pickupDate,
+        });
+
+      expect(search).toThrow(
+        'A data de devolução deve ser posterior à data de retirada.',
+      );
+      expect(search).toThrow(
+        expect.objectContaining({
+          extensions: { code: 'BAD_USER_INPUT' },
+        }),
+      );
+      expect(findMany).not.toHaveBeenCalled();
+    });
+
+    it('rejeita data inválida com erro descritivo', () => {
+      expect(() =>
+        service.search({ ...input, pickupDate: new Date('amanhã') }),
+      ).toThrow(
+        'As datas de retirada e devolução devem estar no formato ISO 8601.',
+      );
+      expect(findMany).not.toHaveBeenCalled();
+    });
+
+    it('rejeita devolução igual à retirada', () => {
+      expect(() =>
+        service.search({ ...input, returnDate: input.pickupDate }),
+      ).toThrow('A data de devolução deve ser posterior à data de retirada.');
+    });
+  });
+
   it('mantém imageUrl nulo quando o veículo não tem imagem', async () => {
     findMany.mockResolvedValue([{ ...dbVehicle, imageUrl: null }]);
 

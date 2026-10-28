@@ -11,6 +11,11 @@ type Category {
   name: String!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 """Local de retirada e devolução de veículos"""
 type Location {
   """Endereço do local"""
@@ -40,6 +45,20 @@ type Query {
   locations: [Location!]!
 
   """
+  Lista paginada dos veículos disponíveis para retirada e devolução no período e locais informados
+  """
+  searchVehicles(
+    """Critérios da busca"""
+    input: SearchVehiclesInput!
+
+    """Quantidade de veículos a pular (offset)"""
+    skip: Int! = 0
+
+    """Quantidade de veículos por página (máximo 27)"""
+    take: Int! = 9
+  ): VehiclePage!
+
+  """
   Lista paginada dos veículos disponíveis com a categoria, filtrando opcionalmente por categoria
   """
   vehicles(
@@ -52,6 +71,24 @@ type Query {
     """Quantidade de veículos por página (máximo 27)"""
     take: Int! = 9
   ): VehiclePage!
+}
+
+"""Critérios de busca de veículos disponíveis por período e local"""
+input SearchVehiclesInput {
+  """Filtra pelos veículos desta categoria"""
+  categoryId: ID
+
+  """Data e hora de retirada"""
+  pickupDate: DateTime!
+
+  """Local de retirada do veículo"""
+  pickupLocationId: ID!
+
+  """Data e hora de devolução, posterior à de retirada"""
+  returnDate: DateTime!
+
+  """Local de devolução do veículo"""
+  returnLocationId: ID!
 }
 
 """Tipo de câmbio do veículo"""
