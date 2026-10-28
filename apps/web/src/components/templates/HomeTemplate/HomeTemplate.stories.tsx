@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { CarCatalog } from "@/components/organisms";
+import { CarCatalog, CarSearchBar } from "@/components/organisms";
 import { sampleCategories, sampleCars } from "@/lib/cars";
 import { HomeTemplate } from "./HomeTemplate";
 
@@ -9,6 +9,15 @@ const meta = {
   component: HomeTemplate,
   parameters: { layout: "fullscreen" },
   args: {
+    searchBar: (
+      <CarSearchBar
+        locations={[
+          { id: "gru", name: "Aeroporto de Guarulhos", city: "Guarulhos", state: "SP" },
+          { id: "bh", name: "Savassi", city: "Belo Horizonte", state: "MG" },
+        ]}
+        onSearch={fn()}
+      />
+    ),
     children: (
       <CarCatalog
         cars={sampleCars}

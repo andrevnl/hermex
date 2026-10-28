@@ -1,9 +1,9 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useOptimistic, useTransition, type ComponentProps } from "react";
+import { useOptimistic, type ComponentProps } from "react";
 import { CarCatalog } from "@/components/organisms";
 import { CATEGORY_PARAM } from "@/lib/search-params";
+import { useCatalogNavigation } from "./catalog-transition";
 
 type CategoryCatalogProps = Omit<
   ComponentProps<typeof CarCatalog>,
@@ -17,29 +17,22 @@ export function CategoryCatalog({
   className = "",
   ...props
 }: CategoryCatalogProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, navigate } = useCatalogNavigation();
   // o dropdown mostra a escolha na hora, sem esperar a resposta do servidor
   const [optimisticCategoryId, setOptimisticCategoryId] =
     useOptimistic(selectedCategoryId);
 
   function handleCategoryChange(categoryId: string | null) {
-    const params = new URLSearchParams(searchParams);
-    if (categoryId) {
-      params.set(CATEGORY_PARAM, categoryId);
-    } else {
-      params.delete(CATEGORY_PARAM);
-    }
-    const query = params.toString();
-
-    startTransition(() => {
-      setOptimisticCategoryId(categoryId);
-      router.replace(query ? `${pathname}?${query}` : pathname, {
-        scroll: false,
-      });
-    });
+    navigate(
+      (params) => {
+        if (categoryId) {
+          params.set(CATEGORY_PARAM, categoryId);
+        } else {
+          params.delete(CATEGORY_PARAM);
+        }
+      },
+      () => setOptimisticCategoryId(categoryId),
+    );
   }
 
   return (

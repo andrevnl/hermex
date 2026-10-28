@@ -1,9 +1,16 @@
 import { Suspense } from "react";
+import { CarSearchBar } from "@/components/organisms";
 import { HomeTemplate } from "@/components/templates";
 import { toCar } from "@/lib/cars";
-import { CATEGORY_PARAM } from "@/lib/search-params";
+import { getLocations } from "@/lib/locations";
+import { readCategory, readSearch } from "@/lib/search-params";
 import { getCatalog, type Catalog } from "@/lib/vehicles";
+import type { Location } from "@/types/location";
+import { CatalogTransitionProvider } from "./catalog-transition";
 import { CategoryCatalog } from "./category-catalog";
+import { VehicleSearch } from "./vehicle-search";
+
+type SearchParamsProps = Pick<PageProps<"/">, "searchParams">;
 
 function CatalogMessage({ children }: { children: string }) {
   return (
@@ -13,17 +20,30 @@ function CatalogMessage({ children }: { children: string }) {
   );
 }
 
-async function VehicleCatalog({
-  searchParams,
-}: Pick<PageProps<"/">, "searchParams">) {
+async function VehicleSearchBar({ searchParams }: SearchParamsProps) {
+  const search = readSearch(await searchParams);
+
+  let locations: Location[] = [];
+  let error: string | undefined;
+  try {
+    locations = await getLocations();
+  } catch (loadError) {
+    console.error("Falha ao carregar os locais", loadError);
+    error = "Não foi possível carregar os locais. Tente novamente em instantes.";
+  }
+
+  return <VehicleSearch locations={locations} search={search} error={error} />;
+}
+
+async function VehicleCatalog({ searchParams }: SearchParamsProps) {
   // ler a URL já faz a busca acontecer na requisição, então uma API fora do ar
   // no build não deixa a mensagem de erro gravada na página estática
-  const param = (await searchParams)[CATEGORY_PARAM];
-  const categoryId = typeof param === "string" && param ? param : null;
+  const params = await searchParams;
+  const categoryId = readCategory(params);
 
   let catalog: Catalog;
   try {
-    catalog = await getCatalog(categoryId);
+    catalog = await getCatalog(categoryId, readSearch(params));
   } catch (error) {
     console.error("Falha ao carregar o catálogo de veículos", error);
     return (
@@ -51,10 +71,18 @@ async function VehicleCatalog({
 
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
-    <HomeTemplate>
-      <Suspense fallback={<CatalogMessage>Carregando veículos…</CatalogMessage>}>
-        <VehicleCatalog searchParams={searchParams} />
-      </Suspense>
-    </HomeTemplate>
+    <CatalogTransitionProvider>
+      <HomeTemplate
+        searchBar={
+          <Suspense fallback={<CarSearchBar locations={[]} />}>
+            <VehicleSearchBar searchParams={searchParams} />
+          </Suspense>
+        }
+      >
+        <Suspense fallback={<CatalogMessage>Carregando veículos…</CatalogMessage>}>
+          <VehicleCatalog searchParams={searchParams} />
+        </Suspense>
+      </HomeTemplate>
+    </CatalogTransitionProvider>
   );
 }

@@ -24,9 +24,10 @@ export function IconField({
   placeholder,
   ...props
 }: IconFieldProps) {
+  // o ícone do campo substitui o indicador nativo dos inputs de data/hora
   return (
     <label
-      className={`flex cursor-text items-center gap-2 rounded border px-4 py-3 ${fieldTones[tone]} ${className}`}
+      className={`flex cursor-text items-center gap-2 rounded border px-4 py-3 [&_input::-webkit-calendar-picker-indicator]:hidden ${fieldTones[tone]} ${className}`}
     >
       <Icon name={icon} />
       <Input

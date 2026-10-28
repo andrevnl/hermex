@@ -41,3 +41,18 @@ export const Hour: Story = {
   },
   globals: { backgrounds: { value: "primary" } },
 };
+
+// Local de retirada/devolução, com ícone à esquerda.
+export const Location: Story = {
+  args: {
+    tone: "inverse",
+    icon: "location_on",
+    placeholder: "Local de retirada",
+    options: [
+      { value: "gru", label: "Aeroporto de Guarulhos — Guarulhos/SP" },
+      { value: "bh", label: "Savassi — Belo Horizonte/MG" },
+    ],
+    className: "w-96",
+  },
+  globals: { backgrounds: { value: "primary" } },
+};
