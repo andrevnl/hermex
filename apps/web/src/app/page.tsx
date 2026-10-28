@@ -1,10 +1,9 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
-import { CarCatalog } from "@/components/organisms";
 import { HomeTemplate } from "@/components/templates";
 import { toCar } from "@/lib/cars";
-import { getVehicles } from "@/lib/vehicles";
-import type { VehiclePage } from "@/types/vehicle";
+import { CATEGORY_PARAM } from "@/lib/search-params";
+import { getCatalog, type Catalog } from "@/lib/vehicles";
+import { CategoryCatalog } from "./category-catalog";
 
 function CatalogMessage({ children }: { children: string }) {
   return (
@@ -14,14 +13,17 @@ function CatalogMessage({ children }: { children: string }) {
   );
 }
 
-async function VehicleCatalog() {
-  // busca na requisição (com o cache de 60s do getVehicles) para que uma API
-  // fora do ar no build não deixe a mensagem de erro gravada na página estática
-  await connection();
+async function VehicleCatalog({
+  searchParams,
+}: Pick<PageProps<"/">, "searchParams">) {
+  // ler a URL já faz a busca acontecer na requisição, então uma API fora do ar
+  // no build não deixa a mensagem de erro gravada na página estática
+  const param = (await searchParams)[CATEGORY_PARAM];
+  const categoryId = typeof param === "string" && param ? param : null;
 
-  let page: VehiclePage;
+  let catalog: Catalog;
   try {
-    page = await getVehicles();
+    catalog = await getCatalog(categoryId);
   } catch (error) {
     console.error("Falha ao carregar o catálogo de veículos", error);
     return (
@@ -32,14 +34,26 @@ async function VehicleCatalog() {
     );
   }
 
-  return <CarCatalog cars={page.items.map(toCar)} />;
+  const { categories, vehicles } = catalog;
+  // categoria inexistente na URL: o grid fica vazio e o dropdown volta ao placeholder
+  const selectedCategoryId = categories.some(({ id }) => id === categoryId)
+    ? categoryId
+    : null;
+
+  return (
+    <CategoryCatalog
+      cars={vehicles.items.map(toCar)}
+      categories={categories}
+      selectedCategoryId={selectedCategoryId}
+    />
+  );
 }
 
-export default function Home() {
+export default function Home({ searchParams }: PageProps<"/">) {
   return (
     <HomeTemplate>
       <Suspense fallback={<CatalogMessage>Carregando veículos…</CatalogMessage>}>
-        <VehicleCatalog />
+        <VehicleCatalog searchParams={searchParams} />
       </Suspense>
     </HomeTemplate>
   );

@@ -1,27 +1,30 @@
-"use client";
-
-import { useState, type HTMLAttributes } from "react";
+import type { HTMLAttributes } from "react";
 import { CarCard, Dropdown } from "@/components/molecules";
 import type { Car } from "@/lib/cars";
+import type { Category } from "@/types/vehicle";
 
 type CarCatalogProps = HTMLAttributes<HTMLElement> & {
   cars: Car[];
+  categories: Category[];
+  selectedCategoryId: string | null;
+  // null quando o usuário escolhe "Todas as categorias".
+  onCategoryChange: (categoryId: string | null) => void;
 };
 
 const ALL = "all";
 
-export function CarCatalog({ cars, className = "", ...props }: CarCatalogProps) {
-  const [category, setCategory] = useState("");
-
-  const categories = [...new Set(cars.map((car) => car.category))];
+export function CarCatalog({
+  cars,
+  categories,
+  selectedCategoryId,
+  onCategoryChange,
+  className = "",
+  ...props
+}: CarCatalogProps) {
   const options = [
     { value: ALL, label: "Todas as categorias" },
-    ...categories.map((name) => ({ value: name, label: name })),
+    ...categories.map(({ id, name }) => ({ value: id, label: name })),
   ];
-  const visibleCars =
-    category && category !== ALL
-      ? cars.filter((car) => car.category === category)
-      : cars;
 
   return (
     <section
@@ -33,18 +36,20 @@ export function CarCatalog({ cars, className = "", ...props }: CarCatalogProps) 
         tone="brand"
         placeholder="Selecione a categoria"
         options={options}
-        value={category}
-        onChange={(event) => setCategory(event.target.value)}
+        value={selectedCategoryId ?? ""}
+        onChange={({ target: { value } }) =>
+          onCategoryChange(value === ALL ? null : value)
+        }
         className="self-start"
       />
 
-      {visibleCars.length === 0 ? (
+      {cars.length === 0 ? (
         <p className="text-center text-body-md text-neutral-text">
           Nenhum carro encontrado.
         </p>
       ) : (
         <ul className="flex flex-wrap justify-center gap-x-10 gap-y-4">
-          {visibleCars.map((car) => (
+          {cars.map((car) => (
             <li key={car.id} className="flex w-full max-w-90">
               <CarCard
                 name={car.name}

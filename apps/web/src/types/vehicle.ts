@@ -1,6 +1,11 @@
-// Tipos da resposta da query `vehicles` da API GraphQL.
+// Tipos das respostas das queries `vehicles` e `categories` da API GraphQL.
 
 export type Transmission = "MANUAL" | "AUTOMATIC";
+
+export type Category = {
+  id: string;
+  name: string;
+};
 
 export type Vehicle = {
   id: string;
@@ -9,10 +14,7 @@ export type Vehicle = {
   imageUrl: string | null;
   dailyRate: number;
   transmission: Transmission;
-  category: {
-    id: string;
-    name: string;
-  };
+  category: Category;
 };
 
 export type VehiclePage = {

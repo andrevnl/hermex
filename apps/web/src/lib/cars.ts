@@ -1,4 +1,4 @@
-import type { Transmission, Vehicle } from "@/types/vehicle";
+import type { Category, Transmission, Vehicle } from "@/types/vehicle";
 
 export type Car = {
   id: string;
@@ -28,6 +28,15 @@ export function toCar(vehicle: Vehicle): Car {
 }
 
 // Dados de exemplo do Figma, usados só nas stories.
+export const sampleCategories: Category[] = [
+  { id: "compacto", name: "Compacto" },
+  { id: "hatch", name: "Hatch" },
+  { id: "intermediario", name: "Intermediário" },
+  { id: "minivan", name: "Minivan" },
+  { id: "sedan", name: "Sedan" },
+  { id: "suv", name: "Suv" },
+];
+
 export const sampleCars: Car[] = [
   { id: "hb20", name: "Hyundai HB20 1.0", category: "Hatch", details: "Manual", imageSrc: "/images/cars/hb20.png", pricePerDay: 120 },
   { id: "honda-city", name: "Honda City", category: "Hatch", details: "Automático", imageSrc: "/images/cars/honda-city.png", pricePerDay: 130 },

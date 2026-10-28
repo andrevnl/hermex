@@ -1,10 +1,14 @@
 import { cacheLife } from "next/cache";
-import type { VehiclePage } from "@/types/vehicle";
+import type { Category, VehiclePage } from "@/types/vehicle";
 import { gqlFetch } from "./graphql";
 
-const VEHICLES_QUERY = `
-  query Vehicles($take: Int!) {
-    vehicles(take: $take) {
+const CATALOG_QUERY = `
+  query Catalog($categoryId: ID, $take: Int!) {
+    categories {
+      id
+      name
+    }
+    vehicles(categoryId: $categoryId, take: $take) {
       items {
         id
         brand
@@ -22,14 +26,19 @@ const VEHICLES_QUERY = `
   }
 `;
 
-// Primeira página do catálogo; o perfil "minutes" revalida a cada 60 segundos.
-export async function getVehicles(take = 9): Promise<VehiclePage> {
+export type Catalog = {
+  categories: Category[];
+  vehicles: VehiclePage;
+};
+
+// Categorias e primeira página de veículos numa só requisição, em cache por
+// categoria; o perfil "minutes" revalida a cada 60 segundos.
+export async function getCatalog(
+  categoryId?: string | null,
+  take = 9,
+): Promise<Catalog> {
   "use cache";
   cacheLife("minutes");
 
-  const { vehicles } = await gqlFetch<{ vehicles: VehiclePage }>(
-    VEHICLES_QUERY,
-    { take },
-  );
-  return vehicles;
+  return gqlFetch<Catalog>(CATALOG_QUERY, { categoryId, take });
 }
