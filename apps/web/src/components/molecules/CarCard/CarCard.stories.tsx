@@ -27,6 +27,10 @@ export const LongDescription: Story = {
   },
 };
 
+export const WithoutImage: Story = {
+  args: { imageSrc: null },
+};
+
 const cars = [
   ["Hyundai HB20 1.0", "Hatch Manual", "hb20", 120],
   ["Honda City", "Hatch Automático", "honda-city", 130],

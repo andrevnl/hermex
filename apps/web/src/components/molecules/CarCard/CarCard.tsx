@@ -6,7 +6,8 @@ type CarCardProps = {
   name: string;
   // Categoria e câmbio, ex.: "Hatch Manual".
   description: string;
-  imageSrc: string;
+  // Sem imagem, o card mostra só o fundo do espaço reservado à foto.
+  imageSrc?: string | null;
   pricePerDay: number;
   detailsHref: string;
   className?: string;
@@ -25,13 +26,15 @@ export function CarCard({
       className={`flex w-full max-w-90 flex-col items-center gap-4 rounded bg-white p-8 text-black shadow-elevation-2 ${className}`}
     >
       <div className="relative h-40 w-full bg-neutral-details">
-        <Image
-          src={imageSrc}
-          alt={name}
-          fill
-          sizes="280px"
-          className="object-contain p-3"
-        />
+        {imageSrc && (
+          <Image
+            src={imageSrc}
+            alt={name}
+            fill
+            sizes="280px"
+            className="object-contain p-3"
+          />
+        )}
       </div>
       <div className="flex w-full flex-col gap-4">
         <div className="flex flex-col gap-2">

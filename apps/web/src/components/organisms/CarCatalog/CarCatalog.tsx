@@ -45,13 +45,13 @@ export function CarCatalog({ cars, className = "", ...props }: CarCatalogProps) 
       ) : (
         <ul className="flex flex-wrap justify-center gap-x-10 gap-y-4">
           {visibleCars.map((car) => (
-            <li key={car.slug} className="flex w-full max-w-90">
+            <li key={car.id} className="flex w-full max-w-90">
               <CarCard
                 name={car.name}
                 description={`${car.category} ${car.details}`}
-                imageSrc={`/images/cars/${car.slug}.png`}
+                imageSrc={car.imageSrc}
                 pricePerDay={car.pricePerDay}
-                detailsHref={`/veiculos/${car.slug}`}
+                detailsHref={`/veiculos/${car.id}`}
               />
             </li>
           ))}
